@@ -298,20 +298,9 @@ exports.deletePostComment = async (req, res, next) => {
 // Comments Replies CRUD operations
 
 exports.getPostCommentReplies = async (req, res, next) => {
-  const { id: postId, commentId } = req.params;
+  const { commentId } = req.params;
 
   try {
-    const post = await Post.findOne({
-      _id: postId,
-      comments: { $in: [commentId] },
-    });
-
-    if (!post) {
-      const error = new Error("Post or comment not found");
-      error.statusCode = 404;
-      throw error;
-    }
-
     const replies = await Reply.find({ commentId: commentId });
 
     if (!replies) {
@@ -328,23 +317,12 @@ exports.getPostCommentReplies = async (req, res, next) => {
 
 exports.createPostCommentReply = async (req, res, next) => {
   const { content } = req.body;
-  const { id: postId, commentId } = req.params;
+  const { commentId } = req.params;
 
   try {
     if (!content) {
       const error = new Error("Content is required");
       error.statusCode = 422;
-      throw error;
-    }
-
-    const post = await Post.findOne({
-      _id: postId,
-      comments: { $in: [commentId] },
-    });
-
-    if (!post) {
-      const error = new Error("Post or comment not found");
-      error.statusCode = 404;
       throw error;
     }
 
@@ -378,23 +356,12 @@ exports.createPostCommentReply = async (req, res, next) => {
 
 exports.putPostCommentReply = async (req, res, next) => {
   const { content } = req.body;
-  const { id: postId, commentId, replyId } = req.params;
+  const { commentId, replyId } = req.params;
 
   try {
     if (!content) {
       const error = new Error("Content is required");
       error.statusCode = 422;
-      throw error;
-    }
-
-    const post = await Post.findOne({
-      _id: postId,
-      comments: { $in: [commentId] },
-    });
-
-    if (!post) {
-      const error = new Error("Post or comment not found");
-      error.statusCode = 404;
       throw error;
     }
 
@@ -420,25 +387,13 @@ exports.putPostCommentReply = async (req, res, next) => {
 };
 
 exports.deletePostCommentReply = async (req, res, next) => {
-  const { content } = req.body;
-  const { id: postId, commentId, replyId } = req.params;
+  const { commentId, replyId } = req.params;
 
   try {
-    const post = await Post.findOne({
-      _id: postId,
-      comments: { $in: [commentId] },
-    });
-
-    if (!post) {
-      const error = new Error("Post or comment not found");
-      error.statusCode = 404;
-      throw error;
-    }
-
     const reply = await Reply.findOneAndDelete({
       userId: req.user._id,
       _id: replyId,
-      comment: commentId,
+      commentId: commentId,
     });
 
     if (!reply) {
@@ -447,7 +402,7 @@ exports.deletePostCommentReply = async (req, res, next) => {
       throw error;
     }
 
-    const comment = await comment.findById(commentId);
+    const comment = await Comment.findById(commentId);
 
     if (!comment) {
       const error = new Error("Comment not found");

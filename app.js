@@ -25,6 +25,12 @@ app.use(authRoutes);
 app.use(userRoutes);
 app.use(blogRoutes);
 
+app.use((req, res, next) => {
+  const error = new Error(`Cannot ${req.method} ${req.originalUrl}`);
+  error.statusCode = 404;
+  next(error);  
+});
+
 app.use(errorHandler);
 
 mongoose.connect(MONGO_URI).then(() => {

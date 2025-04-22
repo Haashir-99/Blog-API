@@ -6,6 +6,8 @@ const postController = require("../controllers/post");
 const authenticateJwt = require("../middleware/auth");
 const validateRequest = require("../middleware/validation");
 
+// Post E ndpoints
+
 // GET posts
 router.get("/posts", postController.getPosts);
 
@@ -69,6 +71,8 @@ router.delete(
   postController.deletePost
 );
 
+// Comments Endpoints
+
 // GET post/:id/comments -- GET all comments for a post
 router.get(
   "/post/:id/comments",
@@ -93,8 +97,12 @@ router.post(
   "/post/:id/comments",
   authenticateJwt,
   [
-    body("content").isString().withMessage("Content must be a string").notEmpty().withMessage("Content is required"),
-    param("id").isMongoId().withMessage("Invalid post ID")
+    body("content")
+      .isString()
+      .withMessage("Content must be a string")
+      .notEmpty()
+      .withMessage("Content is required"),
+    param("id").isMongoId().withMessage("Invalid post ID"),
   ],
   validateRequest,
   postController.createPostComment
@@ -124,37 +132,37 @@ router.delete(
   postController.deletePostComment
 );
 
-// GET post/:id/comment/:commentId/replies -- GET all replies for a comment
+// Comment Replies Endpoints
+
+// GET comment/:commentId/replies -- GET all replies for a comment
 router.get(
-  "/post/:id/comments/:commentId/replies",
-  [
-    param("id").isMongoId().withMessage("Invalid post ID"),
-    param("commentId").isMongoId().withMessage("Invalid comment ID"),
-  ],
+  "/comment/:commentId/replies",
+  [param("commentId").isMongoId().withMessage("Invalid comment ID")],
   validateRequest,
   postController.getPostCommentReplies
 );
 
-// POST post/:id/comments/:commentId/replies -- POST a reply
+// POST comments/:commentId/replies -- POST a reply
 router.post(
-  "/post/:id/comment/:commentId/replies",
+  "/comment/:commentId/replies",
   authenticateJwt,
   [
-    body("content").isString().withMessage("Content must be a string").notEmpty().withMessage("Content is required"),
-    param("id").isMongoId().withMessage("Invalid post ID"),
+    body("content")
+      .isString()
+      .withMessage("Content must be a string")
+      .notEmpty()
+      .withMessage("Content is required"),
     param("commentId").isMongoId().withMessage("Invalid comment ID"),
   ],
   validateRequest,
   postController.createPostCommentReply
+);
 
-) 
-
-// PUT post/:id/comment/:commentId/replies/:replyId -- PUT a reply
+// PUT comment/:commentId/replies/:replyId -- PUT a reply
 router.put(
-  "/post/:id/comment/:commentId/replies/:replyId",
+  "/comment/:commentId/replies/:replyId",
   authenticateJwt,
   [
-    param("id").isMongoId().withMessage("Invalid post ID"),
     param("commentId").isMongoId().withMessage("Invalid comment ID"),
     param("replyId").isMongoId().withMessage("Invalid reply ID"),
   ],
@@ -162,12 +170,11 @@ router.put(
   postController.putPostCommentReply
 );
 
-// DELETE post/:id/comment/:commentId/replies/:replyId -- DELETE a reply
+// DELETE comment/:commentId/replies/:replyId -- DELETE a reply
 router.delete(
-  "/post/:id/comment/:commentId/replies/:replyId",
+  "/comment/:commentId/replies/:replyId",
   authenticateJwt,
   [
-    param("id").isMongoId().withMessage("Invalid post ID"),
     param("commentId").isMongoId().withMessage("Invalid comment ID"),
     param("replyId").isMongoId().withMessage("Invalid reply ID"),
   ],
